@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+
+  train-app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: train-ticket-app
+    ports:
+      - "8081:8080"
+    depends_on:
+      - oracle-db
+    restart: always
+
+    # volume for logs or external files (optional but useful)
+    volumes:
+      - app_logs:/usr/local/tomcat/logs
+
+    environment:
+      - DB_HOST=oracle-db
+      - DB_PORT=1521
+      - DB_SERVICE=FREEPDB1
+
+
+  oracle-db:
+    image: container-registry.oracle.com/database/free
+    container_name: oracle-db
+    ports:
+      - "1521:1521"
+    restart: always
+
+    environment:
+       ORACLE_PWD: oracle123
+
+    # IMPORTANT: persistent DB storage
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+
+
+# Named volumes (Docker managed storage)
+volumes:
+  oracle_data:
+  app_logs:
